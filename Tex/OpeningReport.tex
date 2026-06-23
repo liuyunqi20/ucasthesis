@@ -57,6 +57,15 @@ TVM构建了从计算图到张量程序和目标代码的端到端编译体系\c
 
 \section{主要研究内容}
 
+本文的主要研究内容可以概括为智能体候选生成、NPU后端反馈映射、联合搜索与经验反哺三个相互衔接的部分，如图~\ref{fig:research_contents}所示。其中，智能体候选生成负责将算子语义约束转化为Triton程序和初始调度方案，NPU后端反馈映射负责把编译器IR、资源统计和性能诊断转化为可执行的优化动作，联合搜索与经验反哺则在代码、调度参数和Pass配置之间进行协同调优，并将验证后的优化轨迹反向沉淀为后续生成和编译器优化的先验。
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{research_contents.drawio.png}
+    \bicaption{主要研究内容及其关系。}{Main research contents and their relationships.}
+    \label{fig:research_contents}
+\end{figure}
+
 第一，研究面向NPU后端协同调优的Triton算子生成智能体。该智能体输入自然语言算子描述、PyTorch参考实现、输入输出形状、数据类型、误差范围和目标硬件信息，输出Triton程序、调度配置以及可选的编译Pass配置建议。为避免智能体直接从参考代码跳转到Triton源代码，本文拟引入中间规划表示\texttt{KernelPlan}，描述输入输出张量及其索引关系、并行维度、归约维度、广播维度、分块层次、边界处理、数据驻留、复用和中间结果生命周期。\nocite{jia2019taso}
 
 第二，研究NPU后端反馈到智能体动作的映射机制。NPU的性能瓶颈通常不只体现在最终运行时间上，还可能来自片上存储容量不足、DMA搬运过多、计算与通信重叠不足、处理单元利用率偏低、片上网络压力过大或某些Pass引入了低效布局。本文需要将NPU Triton编译器后端产生的IR、Pass诊断、资源统计和性能模型结果转化为智能体可理解、可执行的反馈，建立“诊断信息—性能瓶颈—优化动作”之间的对应关系。
