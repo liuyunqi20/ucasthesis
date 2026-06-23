@@ -2,22 +2,4 @@
 %->> Frontmatter
 %---------------------------------------------------------------------------%
 \maketitle
-\MAKETITLE
-\makedeclaration
-
-\intobmk\chapter*{摘\quad 要}
-\setcounter{page}{1}
-\pagenumbering{Roman}
-
-随着深度学习模型结构持续演进，算子融合、稀疏计算、注意力机制以及低精度计算等新型负载不断出现，传统依赖人工开发高性能算子库的方式难以覆盖快速增长的“长尾算子”。Triton以块级张量程序作为编程抽象，在易编程性与硬件性能之间建立了较好的平衡，但高质量Triton程序仍要求开发者掌握数据分块、存储层次、线程映射和流水调度等知识。同时，现有Triton编译链主要面向GPU的SIMT执行模型，难以直接适应具有显式片上存储、DMA传输、处理单元阵列和静态数据流调度特征的NPU架构。
-
-本课题拟研究一种面向Triton生成的智能体与编译器协同优化方法，形成“智能体生成—编译器分析—运行反馈—知识反哺”的闭环系统。研究内容包括两部分：第一，构建具备算子语义理解、Triton代码生成、编译执行和性能迭代能力的智能体，并深度融合面向数据流NPU架构的Triton编译器后端中间表示、Pass诊断和性能模型，在代码生成、调度参数与IR级优化之间进行联合调优；第二，建立智能体与编译器之间的双向反馈机制，使智能体利用编译器诊断和硬件性能数据优化代码，同时将跨算子积累的经验转化为编译器调度先验、Pass选择策略和可验证优化规则。课题将通过算子正确率、生成代码性能、NPU利用率、片外访存量、编译搜索开销和跨负载泛化能力等指标进行验证。
-
-\keywords{Triton，大模型智能体，张量编译器，数据流NPU，自动调优，协同优化}
-
-\intobmk\chapter*{Abstract}
-
-This proposal studies an agent--compiler co-optimization method for Triton generation. The system builds a closed loop of agent generation, compiler analysis, runtime feedback, and knowledge reuse. It combines operator semantic planning, Triton code generation, IR-level feedback from a dataflow NPU Triton backend, and bidirectional feedback so that compiler diagnostics and hardware performance data can guide code and schedule optimization, while accumulated cross-operator experience can be promoted into scheduling priors, pass-selection strategies, and verified compiler rules.
-
-\KEYWORDS{Triton, large language model agent, tensor compiler, dataflow NPU, auto-tuning, co-optimization}
 %---------------------------------------------------------------------------%
