@@ -67,13 +67,22 @@ TVM构建了从计算图到张量程序和目标代码的端到端编译体系\c
 
 \section{主要研究内容}
 
-本文的主要研究内容划分为三个相互衔接的部分，如图~\ref{fig:research_contents}所示。第一部分是面向高性能Triton算子生成的智能体设计，重点解决如何从算子语义和手写经验出发生成Kernel设计文档、Triton初始程序，并围绕初始程序开展手写经验驱动的优化迭代；第二部分是中间表示感知的深度智能体优化，重点利用已有NPU Triton编译栈和性能瓶颈分析，对优化迭代中的算子进行IR层面的修改和迭代；第三部分是反馈编译器设计研究，重点基于优化后的IR构建从算子Python代码写法到编译器后端Pass优化流水或建议的反馈机制。
+本文的主要研究内容围绕面向NPU Triton后端的算子生成、IR级优化与编译器反馈展开，整体上划分为三个相互衔接的部分，如图~\ref{fig:research_contents}所示。第一部分是面向高性能Triton算子生成的智能体设计，重点解决如何从算子语义和手写经验出发生成Kernel设计文档、Triton初始程序，并围绕初始程序开展手写经验驱动的优化迭代；第二部分是中间表示感知的深度智能体优化，重点利用已有NPU Triton编译栈和性能瓶颈分析，对优化迭代中的算子进行IR层面的修改和迭代；第三部分是反馈编译器设计研究，重点基于优化后的IR构建从算子Python代码写法到编译器后端Pass优化流水或建议的反馈机制。三个部分分别对应从源代码生成到IR优化、再到经验沉淀和反馈的研究链路，共同构成本文的研究内容框架。
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{Img/research_contents.png}
+    \bicaption{主要研究内容及其关系。}{Main research contents and their relationships.}
+    \label{fig:research_contents}
+\end{figure}
+
+在系统设计层面，本文拟构建一个由输入描述、智能体生成、编译验证、IR级优化和反馈编译器共同组成的闭环系统，其整体设计概况如图~\ref{fig:arch_overview}所示。系统以算子描述、PyTorch参考实现、输入形状和目标NPU配置为起点，经过Kernel设计文档生成、Triton初始程序生成、代码级优化、后端IR分析和深度智能体优化等阶段，最终将优化结果、瓶颈诊断和Pass建议反馈到知识库与编译器后端中，从而支撑后续算子的持续生成与优化。
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{Img/arch_overview.png}
-    \bicaption{主要研究内容及其关系。}{Main research contents and their relationships.}
-    \label{fig:research_contents}
+    \bicaption{整体系统设计概况。}{Overview of the overall system design.}
+    \label{fig:arch_overview}
 \end{figure}
 
 第一，研究面向高性能Triton算子生成的智能体设计。该智能体输入自然语言算子描述、PyTorch参考实现、输入输出形状、数据类型、误差范围和目标硬件信息，首先生成Kernel设计文档，明确算子语义、张量索引关系、并行维度、归约维度、分块层次和中间结果生命周期等；随后根据设计文档生成Triton初始程序，并通过编译检查和差分测试保证初始程序语义正确；然后以该初始程序为优化起点，根据NPU手写Triton算子优化经验设计智能体优化框架，对分块策略、访存方式、归约实现、融合边界和数据搬运组织进行逐轮修改。本文拟将手写高性能Triton算子中的经验组织为可检索的模板和优化策略规则，使智能体在迭代过程中能够借鉴人工优化中的分块、访存、归约和融合经验，以及基于NPU架构特性的性能优化技巧，逐步将初始程序优化为性能接近手写级别的Triton算子。\nocite{jia2019taso}
